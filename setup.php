@@ -46,51 +46,59 @@ function callSPanel($url, $token, $account, $action, $extra = []) {
 // ============================================================
 // STEP 1 — Create Database
 // ============================================================
+// NEW
 echo "<h2>Step 1: Creating Database...</h2>";
 $res = callSPanel($SPANEL_URL, $SPANEL_TOKEN, $SPANEL_ACCOUNT, 'mysql/createmysqldatabase', [
-    'mysql_database' => $DB_NAME,
+    'database' => $DB_NAME,
 ]);
 echo "<pre>" . json_encode($res, JSON_PRETTY_PRINT) . "</pre>";
 
-if (!in_array($res['result'], ['success', 'error']) || 
-    (isset($res['msg']) && str_contains(strtolower($res['msg']), 'exist'))) {
-    echo "<p style='color:orange'>⚠️ Database may already exist, continuing...</p>";
-} elseif ($res['result'] !== 'success') {
+if ($res['result'] === 'success') {
+    echo "<p style='color:green'>✅ Database created successfully.</p>";
+} elseif (str_contains(strtolower($res['msg'] ?? ''), 'exist')) {
+    echo "<p style='color:orange'>⚠️ Database already exists, continuing...</p>";
+} else {
     die("<p style='color:red'>❌ Failed to create database. Stopping.</p>");
 }
-
 // ============================================================
 // STEP 2 — Create Database User
 // ============================================================
+// NEW
 echo "<h2>Step 2: Creating Database User...</h2>";
 $res = callSPanel($SPANEL_URL, $SPANEL_TOKEN, $SPANEL_ACCOUNT, 'mysql/createmysqluser', [
-    'mysql_username' => $DB_USER,
-    'mysql_password' => $DB_PASS,
+    'username' => $DB_USER,
+    'password' => $DB_PASS,
 ]);
 echo "<pre>" . json_encode($res, JSON_PRETTY_PRINT) . "</pre>";
 
-if (isset($res['msg']) && str_contains(strtolower($res['msg']), 'exist')) {
-    echo "<p style='color:orange'>⚠️ User may already exist, continuing...</p>";
-} elseif ($res['result'] !== 'success') {
+if ($res['result'] === 'success') {
+    echo "<p style='color:green'>✅ User created successfully.</p>";
+} elseif (str_contains(strtolower($res['msg'] ?? ''), 'exist')) {
+    echo "<p style='color:orange'>⚠️ User already exists, continuing...</p>";
+} else {
     die("<p style='color:red'>❌ Failed to create user. Stopping.</p>");
 }
 
 // ============================================================
 // STEP 3 — Assign User to Database
 // ============================================================
+// NEW
 echo "<h2>Step 3: Assigning User to Database...</h2>";
 $res = callSPanel($SPANEL_URL, $SPANEL_TOKEN, $SPANEL_ACCOUNT, 'mysql/assignmysqluser', [
-    'mysql_username'  => $DB_FULL_USER,
-    'mysql_database'  => $DB_FULL_NAME,
-    'mysql_privileges' => 'ALL',
+    'username'   => $DB_FULL_USER,
+    'database'   => $DB_FULL_NAME,
+    'privileges' => 'ALL',
 ]);
 echo "<pre>" . json_encode($res, JSON_PRETTY_PRINT) . "</pre>";
 
-if ($res['result'] !== 'success') {
+if ($res['result'] === 'success') {
+    echo "<p style='color:green'>✅ User assigned to database successfully.</p>";
+} elseif (str_contains(strtolower($res['msg'] ?? ''), 'exist') || 
+          str_contains(strtolower($res['msg'] ?? ''), 'already')) {
+    echo "<p style='color:orange'>⚠️ User already assigned, continuing...</p>";
+} else {
     die("<p style='color:red'>❌ Failed to assign user to database. Stopping.</p>");
 }
-
-echo "<p style='color:green'>✅ User assigned to database successfully.</p>";
 
 // ============================================================
 // STEP 4 — Create Tables via PDO
