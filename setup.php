@@ -9,26 +9,22 @@ $DB_PASS      = 'NSSI@2026!';
 
 echo "<h2>Testing Connection...</h2>";
 
-$conn = mysqli_connect('localhost', $DB_FULL_USER, $DB_PASS, $DB_FULL_NAME);
+// Connect WITHOUT database first
+$conn = mysqli_connect('localhost', $DB_FULL_USER, $DB_PASS);
 
 if (!$conn) {
-    die("<p style='color:red'>❌ Connection Error: " . mysqli_connect_errno() . " - " . mysqli_connect_error() . "</p>");
+    die("<p style='color:red'>❌ Error " . mysqli_connect_errno() . ": " . mysqli_connect_error() . "</p>");
 }
 
-echo "<p style='color:green'>✅ Connected successfully!</p>";
+echo "<p style='color:green'>✅ User connected!</p>";
 
-// Show all tables
-echo "<h2>Tables in database:</h2>";
-$result = mysqli_query($conn, "SHOW TABLES");
-
-if (mysqli_num_rows($result) === 0) {
-    echo "<p style='color:orange'>⚠️ No tables found — database is empty.</p>";
-} else {
-    echo "<ul>";
-    while ($row = mysqli_fetch_row($result)) {
-        echo "<li>" . $row[0] . "</li>";
-    }
-    echo "</ul>";
+// Show all databases this user can see
+$result = mysqli_query($conn, "SHOW DATABASES");
+echo "<h3>Databases visible to this user:</h3><ul>";
+while ($row = mysqli_fetch_row($result)) {
+    echo "<li>" . $row[0] . "</li>";
 }
+echo "</ul>";
 
 mysqli_close($conn);
+?>
