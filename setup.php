@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $DB_FULL_NAME = 'ecandycom_ecandy_db';
 $DB_FULL_USER = 'ecandycom_nssi';
