@@ -105,14 +105,14 @@ if ($res['result'] === 'success') {
 // STEP 4 — Create Tables via PDO
 // ============================================================
 echo "<h2>Step 4: Creating Tables...</h2>";
+    // NEW - mysqli
+    $conn = mysqli_connect('localhost', $DB_FULL_USER, $DB_PASS, $DB_FULL_NAME);
 
-try {
-    $pdo = new PDO("mysql:host=localhost;dbname={$DB_FULL_NAME};charset=utf8mb4", $DB_FULL_USER, $DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    if (!$conn) {
+        die("<p style='color:red'>❌ Connection Error: " . mysqli_connect_error() . "</p>");
+    }
 
-    $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS=0");
 
     $statements = [
 
@@ -485,16 +485,16 @@ try {
     $errors  = [];
 
     foreach ($statements as $sql) {
-        try {
-            $pdo->exec($sql);
+        if (mysqli_query($conn, $sql)) {
             preg_match('/`(\w+)`/', $sql, $match);
             $created[] = $match[1] ?? 'statement';
-        } catch (Exception $e) {
-            $errors[] = $e->getMessage();
+        } else {
+            $errors[] = mysqli_error($conn);
         }
     }
 
-    $pdo->exec("SET FOREIGN_KEY_CHECKS=1");
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS=1");
+    mysqli_close($conn);
 
     echo "<h2>Step 4 Result:</h2>";
     echo "<pre>" . json_encode([
@@ -508,7 +508,3 @@ try {
     } else {
         echo "<h2 style='color:orange'>⚠️ Done with some errors. Check above.</h2>";
     }
-
-} catch (Exception $e) {
-    echo "<p style='color:red'>❌ PDO Connection Error: " . $e->getMessage() . "</p>";
-}
