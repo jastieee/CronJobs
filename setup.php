@@ -85,7 +85,7 @@ if ($res['result'] === 'success') {
 // NEW
 echo "<h2>Step 3: Assigning User to Database...</h2>";
 $res = callSPanel($SPANEL_URL, $SPANEL_TOKEN, $SPANEL_ACCOUNT, 'mysql/assignmysqluser', [
-    'username'   => $DB_FULL_USER,
+    'username'   => $DB_USER,
     'database'   => $DB_FULL_NAME,
     'privileges' => 'ALL',
     'hostname'   => 'localhost',
@@ -112,6 +112,7 @@ echo "<h2>Step 4: Creating Tables...</h2>";
         die("<p style='color:red'>❌ Connection Error: " . mysqli_connect_error() . "</p>");
     }
 
+    echo "<p style='color:green'>✅ Connected to database successfully.</p>";
     mysqli_query($conn, "SET FOREIGN_KEY_CHECKS=0");
 
     $statements = [
