@@ -88,6 +88,7 @@ $res = callSPanel($SPANEL_URL, $SPANEL_TOKEN, $SPANEL_ACCOUNT, 'mysql/assignmysq
     'username'   => $DB_FULL_USER,
     'database'   => $DB_FULL_NAME,
     'privileges' => 'ALL',
+    'hostname'   => 'localhost',
 ]);
 echo "<pre>" . json_encode($res, JSON_PRETTY_PRINT) . "</pre>";
 
